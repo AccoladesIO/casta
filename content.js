@@ -1,13 +1,11 @@
+//This content.js file holds the info about the content of the recorder.
 
+window.cameraId = 'castaCamera';
+window.camera = document.getElementById(cameraId);
 
-//
-
-const cameraId = 'castaCamera';
-
-const camera = document.getElementById(cameraId);
-
-if (camera) {
+if (window.camera) {
     console.log('camera found', camera);
+    document.querySelector("#castaCamera").style.display = "block";
 } else {
     const cameraElement = document.createElement('iframe');
     cameraElement.id = cameraId;
