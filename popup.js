@@ -1,6 +1,47 @@
 // Cache DOM elements
 const recordTab = document.getElementById('tab');
 const recordScreen = document.getElementById('screen');
+const faceToggle = document.getElementById('faceToggle');
+const body = document.body;
+const modeToggle = document.getElementById('modeToggle');
+const modeLabel = document.getElementById('modeLabel');
+
+// Set default mode based on system preference or localStorage
+const setDefaultMode = () => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedMode = localStorage.getItem('modeToggle');
+    const isDarkMode = savedMode !== null ? JSON.parse(savedMode) : prefersDark;
+    body.classList.toggle('light-mode', !isDarkMode);
+    modeToggle.checked = isDarkMode;
+    modeLabel.textContent = isDarkMode ? '🌙 Dark Mode' : '🌞 Light Mode';
+};
+
+// Toggle light/dark mode and save to localStorage
+modeToggle.addEventListener('change', () => {
+    const isDarkMode = modeToggle.checked;
+    body.classList.toggle('light-mode', !isDarkMode);
+    modeLabel.textContent = isDarkMode ? '🌙 Dark Mode' : '🌞 Light Mode';
+    localStorage.setItem('modeToggle', JSON.stringify(isDarkMode));
+});
+
+// Initialize with system preference or localStorage
+setDefaultMode();
+
+// Initialize faceToggle state from localStorage
+const setFaceToggleState = () => {
+    const savedFaceToggle = localStorage.getItem('faceToggle');
+    const isFaceToggleOn = savedFaceToggle !== null ? JSON.parse(savedFaceToggle) : false;
+    faceToggle.checked = isFaceToggleOn;
+};
+
+// Save faceToggle state to localStorage
+faceToggle.addEventListener('change', () => {
+    const isFaceToggleOn = faceToggle.checked;
+    localStorage.setItem('faceToggle', JSON.stringify(isFaceToggleOn));
+});
+
+// Initialize faceToggle state
+setFaceToggleState();
 
 // Utility function to get the active tab
 const getActiveTab = async () => {
@@ -48,6 +89,12 @@ const updateUI = async () => {
     const { recording, type } = await checkRecording();
     recordTab.innerText = recording && type === 'tab' ? 'Stop Recording' : 'Record Tab';
     recordScreen.innerText = recording && type === 'screen' ? 'Stop Recording' : 'Record Screen';
+
+    // Update camera visibility based on face recording toggle
+    const faceRecording = faceToggle.checked;
+    if (!faceRecording) {
+        await removeCamera();
+    }
 };
 
 // Start or stop recording based on the current state
@@ -58,7 +105,12 @@ const toggleRecording = async (type) => {
         chrome.runtime.sendMessage({ type: 'stop-recording' });
         await removeCamera();
     } else {
-        await injectCamera();
+        const faceRecording = faceToggle.checked;
+
+        if (faceRecording) {
+            await injectCamera();
+        }
+
         chrome.runtime.sendMessage({ type: 'start-recording', recordingType: type });
     }
 
@@ -74,6 +126,12 @@ const init = async () => {
 
         recordScreen.addEventListener('click', () => toggleRecording('screen'));
         recordTab.addEventListener('click', () => toggleRecording('tab'));
+
+        // Update UI when face recording toggle changes
+        faceToggle.addEventListener('change', async () => {
+            console.log('Face recording:', faceToggle.checked ? 'Enabled' : 'Disabled');
+            await updateUI();
+        });
     } catch (error) {
         console.error('Error initializing the popup:', error);
     }
