@@ -1,3 +1,5 @@
+
+
 const runCode = async () => {
     const cameraElement = document.querySelector('#camera');
     // await user permission for camera
@@ -20,7 +22,6 @@ const runCode = async () => {
         videoElement.setAttribute('style', 'height: 200px; transform: scaleX(-1);');
         cameraElement.appendChild(videoElement);
 
-        // get stream
         const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         videoElement.srcObject = cameraStream;
     }
