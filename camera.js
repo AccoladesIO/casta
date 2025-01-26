@@ -1,31 +1,45 @@
+const initializeCamera = async () => {
+    const cameraContainer = document.querySelector('#camera');
 
-
-const runCode = async () => {
-    const cameraElement = document.querySelector('#camera');
-    // await user permission for camera
-    const permission = await navigator.permissions.query({
-        name: 'camera'
-    });
-    if (permission.state === 'prompt') {
-        await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-        alert('Your Camera is now active')
-        return
-    }
-    if (permission.state === 'denied') {
-        window.alert('Camera permision denied')
+    if (!cameraContainer) {
+        console.error('Camera container element not found');
+        return;
     }
 
-    const startCamera = async () => {
-        const videoElement = document.createElement('video');
-        videoElement.setAttribute('autoplay', true);
-        // videoElement.setAttribute('mute', true);
-        videoElement.setAttribute('style', 'height: 200px; transform: scaleX(-1);');
-        cameraElement.appendChild(videoElement);
+    // Check and request camera permission
+    const cameraPermission = await navigator.permissions.query({ name: 'camera' });
 
-        const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        videoElement.srcObject = cameraStream;
+    if (cameraPermission.state === 'prompt') {
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            alert('Camera is now active.');
+        } catch (error) {
+            console.error('Error accessing the camera:', error);
+            alert('Unable to activate the camera.');
+            return;
+        }
     }
-    startCamera()
-}
 
-runCode()
+    if (cameraPermission.state === 'denied') {
+        alert('Camera permission denied.');
+        return;
+    }
+
+    const activateCamera = async () => {
+        try {
+            const videoElement = document.createElement('video');
+            videoElement.setAttribute('autoplay', 'true');
+            videoElement.style.cssText = 'height: 200px; transform: scaleX(-1);';
+            cameraContainer.appendChild(videoElement);
+
+            const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            videoElement.srcObject = cameraStream;
+        } catch (error) {
+            console.error('Error starting the camera:', error);
+        }
+    };
+
+    await activateCamera();
+};
+
+initializeCamera();

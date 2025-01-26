@@ -9,7 +9,7 @@
             "16": "icons/not-recording.png",
             "32": "icons/not-recording.png"
         },
-        "default_popup": "popup.html"
+        "default_popup": "index.html"
     },
     "host_permissions": [
         "https://*/*",

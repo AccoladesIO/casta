@@ -1,38 +1,71 @@
-//This content.js file holds the info about the content of the recorder.
+// This content.js file holds the info about the content of the recorder.
 
-window.cameraId = 'castaCamera';
-window.camera = document.getElementById(cameraId);
+const CAMERA_ELEMENT_ID = 'castaCamera';
 
-if (window.camera) {
-    console.log('camera found', camera);
-    document.querySelector("#castaCamera").style.display = "block";
-} else {
-    const cameraElement = document.createElement('iframe');
-    cameraElement.id = cameraId;
-    cameraElement.setAttribute('allow', 'camera; microphone');
-    cameraElement.src = chrome.runtime.getURL('camera.html');
-    cameraElement.setAttribute('style', 'position: fixed; top: 50px; left: 50px; width: 200px; height: 200px; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; border-radius: 50%; cursor: grab;');
-    document.body.appendChild(cameraElement);
+// Helper function to create a draggable iframe element
+const createDraggableIframe = (id, src, styles) => {
+    const iframe = document.createElement('iframe');
+    iframe.id = id;
+    iframe.setAttribute('allow', 'camera; microphone');
+    iframe.src = src;
+    iframe.style.cssText = styles;
 
     let isDragging = false;
-    let offsetX, offsetY;
+    let dragOffsetX, dragOffsetY;
 
-    cameraElement.addEventListener('mousedown', (e) => {
+    iframe.addEventListener('mousedown', (event) => {
         isDragging = true;
-        offsetX = e.clientX - cameraElement.offsetLeft;
-        offsetY = e.clientY - cameraElement.offsetTop;
-        cameraElement.style.cursor = 'grabbing';
+        dragOffsetX = event.clientX - iframe.offsetLeft;
+        dragOffsetY = event.clientY - iframe.offsetTop;
+        iframe.style.cursor = 'grabbing';
     });
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', (event) => {
         if (isDragging) {
-            cameraElement.style.left = `${e.clientX - offsetX}px`;
-            cameraElement.style.top = `${e.clientY - offsetY}px`;
+            iframe.style.left = `${event.clientX - dragOffsetX}px`;
+            iframe.style.top = `${event.clientY - dragOffsetY}px`;
         }
     });
 
     document.addEventListener('mouseup', () => {
-        isDragging = false;
-        cameraElement.style.cursor = 'grab';
+        if (isDragging) {
+            isDragging = false;
+            iframe.style.cursor = 'grab';
+        }
     });
-}
+
+    return iframe;
+};
+
+// Main logic
+const initCameraElement = () => {
+    const existingCameraElement = document.getElementById(CAMERA_ELEMENT_ID);
+
+    if (existingCameraElement) {
+        console.log('Camera element found:', existingCameraElement);
+        existingCameraElement.style.display = 'block';
+        return;
+    }
+
+    const cameraIframeStyles = `
+        position: fixed;
+        top: 50px;
+        left: 50px;
+        width: 200px;
+        height: 200px;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        border-radius: 50%;
+        cursor: grab;
+    `;
+    const cameraIframe = createDraggableIframe(
+        CAMERA_ELEMENT_ID,
+        chrome.runtime.getURL('camera.html'),
+        cameraIframeStyles
+    );
+
+    document.body.appendChild(cameraIframe);
+};
+
+// Initialize the camera element
+initCameraElement();
