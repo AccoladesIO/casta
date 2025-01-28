@@ -16,7 +16,6 @@ const fetchBlobAsBase64 = async (url) => {
     return base64;
 };
 
-// Listen for messages from the service worker - start recording - stop recording
 chrome.runtime.onMessage.addListener((request, sender) => {
     console.log("Message received", request, sender);
 
@@ -41,7 +40,6 @@ const stopRecording = () => {
     console.log("Stop recording");
     if (mediaRecorder?.state === "recording") {
         mediaRecorder.stop();
-        // Stop all media tracks
         mediaRecorder.stream.getTracks().forEach((track) => track.stop());
     }
 };
@@ -51,11 +49,9 @@ const startRecording = async (focusedTabId) => {
         ["screen", "window"],
         async (streamId) => {
             if (!streamId) {
-                console.log("No stream selected");
                 return;
             }
 
-            console.log("Stream ID from desktop capture", streamId);
 
             const screenStream = await navigator.mediaDevices.getUserMedia({
                 audio: {
@@ -87,30 +83,23 @@ const startRecording = async (focusedTabId) => {
                     microphoneStream.getAudioTracks()[0],
                 ]);
 
-                console.log("Combined stream", combinedStream);
 
                 mediaRecorder = new MediaRecorder(combinedStream, {
                     mimeType: "video/webm",
                 });
 
                 mediaRecorder.ondataavailable = (event) => {
-                    console.log("Data available", event);
                     recordedChunks.push(event.data);
                 };
 
                 mediaRecorder.onstop = async () => {
-                    console.log("Recording stopped");
                     const recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
                     const blobUrl = URL.createObjectURL(recordedBlob);
-
                     window.open(blobUrl);
-
                     console.log("Blob URL", blobUrl);
                     recordedChunks = [];
                 };
-
                 mediaRecorder.start();
-
                 if (focusedTabId) {
                     chrome.tabs.update(focusedTabId, { active: true });
                 }
