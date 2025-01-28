@@ -1,4 +1,3 @@
-// This content.js file holds the info about the content of the recorder.
 
 const CAMERA_ELEMENT_ID = 'castaCamera';
 
@@ -33,11 +32,9 @@ const createDraggableIframe = (id, src, styles) => {
             iframe.style.cursor = 'grab';
         }
     });
-
     return iframe;
 };
 
-// Main logic
 const initCameraElement = () => {
     const existingCameraElement = document.getElementById(CAMERA_ELEMENT_ID);
 
@@ -67,5 +64,4 @@ const initCameraElement = () => {
     document.body.appendChild(cameraIframe);
 };
 
-// Initialize the camera element
 initCameraElement();
