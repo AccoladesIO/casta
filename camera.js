@@ -6,7 +6,6 @@ const initializeCamera = async () => {
         return;
     }
 
-    // Check and request camera permission
     const cameraPermission = await navigator.permissions.query({ name: 'camera' });
 
     if (cameraPermission.state === 'prompt') {
