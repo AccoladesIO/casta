@@ -18,7 +18,7 @@ const setDefaultThemeMode = () => {
 
     bodyElement.classList.toggle("light-mode", !isDarkMode);
     modeToggleSwitch.checked = isDarkMode;
-    modeLabelElement.textContent = isDarkMode ? "🌙 Dark Mode" : "🌞 Light Mode";
+    modeLabelElement.textContent = isDarkMode ? "🌙 Mode" : "🌞 Mode";
 };
 
 /**
@@ -27,8 +27,7 @@ const setDefaultThemeMode = () => {
 const toggleThemeMode = () => {
     const isDarkMode = modeToggleSwitch.checked;
     bodyElement.classList.toggle("light-mode", !isDarkMode);
-    modeLabelElement.textContent = isDarkMode ? "🌙 Dark Mode" : "🌞 Light Mode";
-    // Save to localStorage after the change
+    modeLabelElement.textContent = isDarkMode ? "🌙 Mode" : "🌞 Mode";
     localStorage.setItem("modeToggle", JSON.stringify(isDarkMode));
 };
 
@@ -105,7 +104,6 @@ const removeCameraElement = async () => {
  */
 const getRecordingStatus = async () => {
     const { recording = false, type = "" } = await chrome.storage.local.get(["recording", "type"]);
-    console.log("[Recording Status]", { recording, type });
     return { recording, type };
 };
 
@@ -147,7 +145,6 @@ const toggleRecordingState = async (recordingType) => {
         if (faceToggleSwitch.checked) {
             await injectCameraScript();
         }
-
         chrome.runtime.sendMessage({ type: "start-recording", recordingType });
     }
 
@@ -165,21 +162,17 @@ const initializePopup = async () => {
         recordScreenButton.addEventListener("click", () => toggleRecordingState("screen"));
         recordTabButton.addEventListener("click", () => toggleRecordingState("tab"));
 
-        // Save face toggle state when it changes
         faceToggleSwitch.addEventListener("change", async () => {
-            console.log("[Face Recording] State:", faceToggleSwitch.checked ? "Enabled" : "Disabled");
-            await saveFaceToggleState(); // Save the state and update immediately
+            await saveFaceToggleState(); 
             await updateUIState();
         });
 
-        // Save theme mode state when it changes
         modeToggleSwitch.addEventListener("change", toggleThemeMode);
     } catch (error) {
         console.error("[Popup Initialization] Error:", error);
     }
 };
 
-// Set default states and initialize
 setDefaultThemeMode();
 setFaceToggleInitialState();
 initializePopup();
