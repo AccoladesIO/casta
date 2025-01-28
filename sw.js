@@ -46,7 +46,6 @@ const removeCameraElement = async () => {
  * @param {chrome.tabs.TabActiveInfo} activeInfo - Details of the activated tab
  */
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    console.log("Tab activated:", activeInfo);
 
     const activeTab = await chrome.tabs.get(activeInfo.tabId);
     if (!activeTab || activeTab.url.startsWith("chrome://") || activeTab.url.startsWith("chrome-extension://")) {
@@ -84,20 +83,10 @@ const startRecording = async (type) => {
 // Stop recording and clean up resources
 const stopRecording = async () => {
     console.log("Stopping recording");
-
-    // Update recording status
     updateRecordingStatus(false, "");
-
-    // Reset action icon
     chrome.action.setIcon({ path: "icons/not-recording.png" });
-
-    // Stop tab recording if active
     await handleTabRecording(false);
-
-    // Stop the camera stream
     await stopCameraStream();
-
-    // End tab capture
     await endTabCapture();
 };
 
@@ -111,7 +100,7 @@ const stopCameraStream = async () => {
                 if (videoStream) {
                     videoStream.getTracks().forEach((track) => track.stop());
                 }
-                camera.remove(); // Remove the camera element from the DOM
+                camera.remove(); 
             }
         },
     });
@@ -122,7 +111,6 @@ const endTabCapture = async () => {
     try {
         const stream = await chrome.tabCapture.getCapturedTabs();
         if (stream && stream.length > 0) {
-            // Stop the tab capture stream
             stream[0].getTracks().forEach((track) => track.stop());
         }
     } catch (error) {
@@ -200,8 +188,6 @@ const openVideoPlaybackTab = async ({ url, base64 }) => {
  * Listener for runtime messages
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log("Message received:", request);
-
     (async () => {
         try {
             switch (request.type) {
@@ -218,10 +204,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     sendResponse({ success: false, message: "Unknown request type" });
             }
         } catch (error) {
-            console.error("Error handling message:", error);
             sendResponse({ success: false, error: error.message });
         }
     })();
-
     return true; // Keeps the message channel open for asynchronous response
 });
