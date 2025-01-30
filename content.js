@@ -1,45 +1,77 @@
-
 const CAMERA_ELEMENT_ID = 'castaCamera';
 
-// Helper function to create a draggable iframe element
+/**
+ * Creates a draggable iframe inside a wrapper div with a transparent overlay for drag handling.
+ * 
+ * @param {string} id - The ID of the wrapper element.
+ * @param {string} src - The source URL of the iframe content.
+ * @param {string} styles - The CSS styles for the wrapper element.
+ * @return {HTMLElement} - The draggable wrapper element containing the iframe.
+ */
 const createDraggableIframe = (id, src, styles) => {
+    const wrapper = document.createElement('div');
+    wrapper.id = id;
+    wrapper.style.cssText = styles;
+
     const iframe = document.createElement('iframe');
-    iframe.id = id;
     iframe.setAttribute('allow', 'camera; microphone');
     iframe.src = src;
-    iframe.style.cssText = styles;
+    iframe.style.cssText = `
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: none;
+        pointer-events: auto;
+    `;
+
+    const dragOverlay = document.createElement('div');
+    dragOverlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+        z-index: 2;
+        background: transparent;
+    `;
 
     let isDragging = false;
     let dragOffsetX, dragOffsetY;
 
-    iframe.addEventListener('mousedown', (event) => {
+    dragOverlay.addEventListener('mousedown', (event) => {
         isDragging = true;
-        dragOffsetX = event.clientX - iframe.offsetLeft;
-        dragOffsetY = event.clientY - iframe.offsetTop;
-        iframe.style.cursor = 'grabbing';
+        dragOffsetX = event.clientX - wrapper.offsetLeft;
+        dragOffsetY = event.clientY - wrapper.offsetTop;
+        dragOverlay.style.cursor = 'grabbing';
     });
 
     document.addEventListener('mousemove', (event) => {
         if (isDragging) {
-            iframe.style.left = `${event.clientX - dragOffsetX}px`;
-            iframe.style.top = `${event.clientY - dragOffsetY}px`;
+            wrapper.style.left = `${event.clientX - dragOffsetX}px`;
+            wrapper.style.top = `${event.clientY - dragOffsetY}px`;
         }
     });
 
     document.addEventListener('mouseup', () => {
         if (isDragging) {
             isDragging = false;
-            iframe.style.cursor = 'grab';
+            dragOverlay.style.cursor = 'grab';
         }
     });
-    return iframe;
+
+    wrapper.appendChild(iframe);
+    wrapper.appendChild(dragOverlay);
+    return wrapper;
 };
 
+/**
+ * Initializes the draggable camera element. If it already exists, it becomes visible again.
+ */
 const initCameraElement = () => {
     const existingCameraElement = document.getElementById(CAMERA_ELEMENT_ID);
 
     if (existingCameraElement) {
-        console.log('Camera element found:', existingCameraElement);
         existingCameraElement.style.display = 'block';
         return;
     }
@@ -55,6 +87,7 @@ const initCameraElement = () => {
         border-radius: 50%;
         cursor: grab;
     `;
+
     const cameraIframe = createDraggableIframe(
         CAMERA_ELEMENT_ID,
         chrome.runtime.getURL('camera.html'),
