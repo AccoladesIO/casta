@@ -63,7 +63,7 @@ async function startRecording (streamId) {
 
         mediaRecorder = new MediaRecorder(combinedStream, {
             mimeType: "video/webm",
-            videoBitsPerSecond: 5000000, 
+            videoBitsPerSecond: 5000000,
         });
 
         mediaRecorder.ondataavailable = handleDataAvailable;
@@ -93,7 +93,7 @@ async function getTabMediaStream (streamId) {
             mandatory: {
                 chromeMediaSource: "tab",
                 chromeMediaSourceId: streamId,
-                maxWidth: 1920, 
+                maxWidth: 1920,
                 maxHeight: 1080,
                 maxFrameRate: 30,
             },
