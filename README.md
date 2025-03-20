@@ -110,7 +110,7 @@ cd screen-tab-recorder
 
 ---
 ## Contributors
-- **Your Name** (@accoladesio)
+- **Name** (@accoladesio)
 - Open to contributions! Feel free to submit PRs.
 
 ---
