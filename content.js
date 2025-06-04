@@ -36,6 +36,21 @@ const createDraggableIframe = (id, src, styles) => {
         background: transparent;
     `;
 
+    const resizeHandle = document.createElement('div');
+    resizeHandle.style.cssText = `
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        cursor: nwse-resize;
+        z-index: 1000;
+        background: black;
+        border: 2px solid black;
+        color: black;
+        clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
+    `;
+
     let isDragging = false;
     let dragOffsetX, dragOffsetY;
 
@@ -60,8 +75,36 @@ const createDraggableIframe = (id, src, styles) => {
         }
     });
 
+    let isResizing = false;
+    let initialWidth, initialHeight, initialMouseX, initialMouseY;
+
+    resizeHandle.addEventListener('mousedown', (event) => {
+        isResizing = true;
+        initialWidth = wrapper.offsetWidth;
+        initialHeight = wrapper.offsetHeight;
+        initialMouseX = event.clientX;
+        initialMouseY = event.clientY;
+        event.stopPropagation(); // Prevent triggering drag
+    });
+
+    document.addEventListener('mousemove', (event) => {
+        if (isResizing) {
+            const newWidth = initialWidth + (event.clientX - initialMouseX);
+            const newHeight = initialHeight + (event.clientY - initialMouseY);
+            wrapper.style.width = `${Math.max(newWidth, 50)}px`; // Minimum width: 50px
+            wrapper.style.height = `${Math.max(newHeight, 50)}px`; // Minimum height: 50px
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+        }
+    });
+
     wrapper.appendChild(iframe);
     wrapper.appendChild(dragOverlay);
+    wrapper.appendChild(resizeHandle);
     return wrapper;
 };
 
