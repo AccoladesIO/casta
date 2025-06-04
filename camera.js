@@ -28,7 +28,8 @@ const initializeCamera = async () => {
         try {
             const videoElement = document.createElement('video');
             videoElement.setAttribute('autoplay', 'true');
-            videoElement.style.cssText = 'height: 200px; transform: scaleX(-1);';
+            videoElement.style.height = '100%';
+            videoElement.style.transform = 'scaleX(-1)';
             cameraContainer.appendChild(videoElement);
 
             const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });

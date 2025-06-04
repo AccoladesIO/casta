@@ -6,15 +6,34 @@
         padding: 0;
     }
 
-    div {
-        width: 200px;
-        height: 200px;
-        position: absolute; /* Make the div positionable */
-        cursor: grab; /* Change cursor to indicate draggable */
+    #camera {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        /* Make the div positionable */
+        cursor: grab;
+        /* Change cursor to indicate draggable */
+        background-color: rgba(0, 0, 0, 0.1);
+        /* Add a background for visibility */
+        border: 1px solid #ccc;
+        border-radius: 10px;
+    }
+
+    #resizeHandle {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        cursor: nwse-resize;
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid #aaa;
+        border-radius: 50%;
     }
 </style>
 
-<div id="camera"></div>
-
+<div id="camera">
+    <div id="resizeHandle"></div>
+</div>
 
 <script src="camera.js"></script>

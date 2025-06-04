@@ -6,6 +6,7 @@ This Chrome browser extension enables users to record browser tabs or the entire
 ## Features
 - **Tab Recording**: Captures the active tab with audio.
 - **Screen Recording**: Records the entire screen, application window, or a specific tab.
+- **Camera resize handler**: Enable changing the position of the camera and resizing the camera.
 - **Camera Overlay**: Enables or disables a webcam feed during recording, also change camera position by dragging the container.
 - **Dark Mode Support**: Adapts UI based on system preferences.
 - **Storage Management**: Saves recording states and user preferences.
